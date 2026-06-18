@@ -1,4 +1,4 @@
-from llm import llm
+from ai_agents.llm import llm
 from backend.models.market_schema import MarketOutput
 from backend.utils.file_writer import save_output
 from backend.utils.safe_llm import extract_json_safe, safe_validate
