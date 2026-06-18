@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output files (VERY IMPORTANT for your project)
+outputs/
+*.json
+
+# Logs
+*.log
+
+# Env secrets
+.env
+.env.local
+
+# Langchain / API keys cache
+*.sqlite
+
