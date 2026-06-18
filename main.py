@@ -1,7 +1,7 @@
-from agents.idea_agent import run_idea_agent
-from agents.market_agent import run_market_agent
-from agents.competitor_agent import run_competitor_agent
-from agents.roadmap_agent import run_roadmap_agent
+from backend.agents.idea_agent import run_idea_agent
+from backend.agents.market_agent import run_market_agent
+from backend.agents.competitor_agent import run_competitor_agent
+from backend.agents.roadmap_agent import run_roadmap_agent
 
 
 def main():

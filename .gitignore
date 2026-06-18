@@ -1,4 +1,4 @@
-# Python
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
@@ -6,27 +6,21 @@ __pycache__/
 
 # Virtual environment
 venv/
-.env/
+.env
 
-# IDE
+# IDE files
 .vscode/
 .idea/
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Output files (VERY IMPORTANT for your project)
+# Outputs (your AI-generated results)
 outputs/
-*.json
 
 # Logs
 *.log
 
-# Env secrets
-.env
-.env.local
-
-# Langchain / API keys cache
+# Database / caches
 *.sqlite
-

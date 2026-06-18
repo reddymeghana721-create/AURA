@@ -1,7 +1,7 @@
 from llm import llm
-from models.competitor_schema import CompetitorOutput
-from utils.file_writer import save_output
-from utils.safe_llm import extract_json_safe, safe_validate
+from backend.models.competitor_schema import CompetitorOutput
+from backend.utils.file_writer import save_output
+from backend.utils.safe_llm import extract_json_safe, safe_validate
 
 
 COMPETITOR_PROMPT = """
