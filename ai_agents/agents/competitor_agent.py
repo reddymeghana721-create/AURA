@@ -1,7 +1,7 @@
 from ai_agents.llm import llm
-from backend.models.competitor_schema import CompetitorOutput
-from backend.utils.file_writer import save_output
-from backend.utils.safe_llm import extract_json_safe, safe_validate
+from ai_agents.models.competitor_schema import CompetitorOutput
+from ai_agents.utils.file_writer import save_output
+from ai_agents.utils.safe_llm import extract_json_safe, safe_validate
 
 
 COMPETITOR_PROMPT = """

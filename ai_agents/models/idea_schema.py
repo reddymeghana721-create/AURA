@@ -1,32 +1,26 @@
 from pydantic import BaseModel
 from typing import List
 
-
 class IdeaOutput(BaseModel):
     product_name: str
-    summary: str
-    industry: str
-    goal: str
+    category: str
 
-    problem_statement: List[str]
-    target_users: List[str]
+    target_users: str
 
-    value_proposition: str
-    usp: str
+    confidence_score: int
 
-    market_category: str
-    monetization_models: List[str]
+    problem_statement: str
+    recommended_solution: str
 
-    competitors: List[str]
-    suggested_mvp_features: List[str]
+    market_size: str
+    target_users_count: int
 
-    assumptions: List[str]
-    success_metrics: List[str]
+    revenue_model: str
 
-    product_vision: str
-    complexity_level: str
+    competitor_count: int
+    mvp_features_count: int
 
-    reasoning_summary: str
-    deep_analysis: str
-    raw_idea: str
+    market_opportunity_summary: str
 
+    next_steps: List[str]
+    

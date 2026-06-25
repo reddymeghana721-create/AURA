@@ -1,43 +1,35 @@
 from ai_agents.llm import llm
-from backend.models.idea_schema import IdeaOutput
-from backend.utils.file_writer import save_output
-from backend.utils.safe_llm import extract_json_safe, safe_validate
+from ai_agents.models.idea_schema import IdeaOutput
+from ai_agents.utils.file_writer import save_output
+from ai_agents.utils.safe_llm import extract_json_safe, safe_validate
 
 
 IDEA_PROMPT = """
-You are an expert startup analyst.
+Analyze the startup idea.
 
-Return ONLY valid JSON (no markdown, no explanation).
+Return ONLY valid JSON.
 
-Analyze this idea:
+{{
+  "product_name": "",
+  "category": "",
+  "target_users": "",
+  "confidence_score": 0,
+  "problem_statement": "",
+  "recommended_solution": "",
+  "market_size": "",
+  "target_users_count": 0,
+  "revenue_model": "",
+  "competitor_count": 0,
+  "mvp_features_count": 0,
+  "market_opportunity_summary": "",
+  "next_steps": []
+}}
+
+confidence_score must be an integer between 0 and 100.
+
+Startup Idea:
 {idea}
-
-You MUST return:
-- product_name
-- summary
-- industry
-- goal
-- problem_statement (list)
-- target_users (list of strings only)
-- value_proposition
-- usp
-- market_category
-- monetization_models (list)
-- competitors (list)
-- suggested_mvp_features (list)
-- assumptions (list)
-- success_metrics (list)
-- product_vision
-- complexity_level
-- reasoning_summary (2-3 lines)
-- deep_analysis (detailed 5-8 lines)
-- raw_idea
-
-CRITICAL TYPE RULES:
-- complexity_level MUST be one of: "Low", "Medium", "High"
-- All lists must be arrays of strings only
 """
-
 
 def run_idea_agent(user_input: str):
 
@@ -58,6 +50,10 @@ def run_idea_agent(user_input: str):
         repaired = llm.invoke(repair_prompt)
 
         data = extract_json_safe(repaired.content)
+
+    print("\n===== RAW IDEA DATA =====")
+    print(data)
+    print("========================\n")
 
     validated = safe_validate(IdeaOutput, data)
 

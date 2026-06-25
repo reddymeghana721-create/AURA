@@ -2,57 +2,17 @@ from pydantic import BaseModel
 from typing import List, Dict
 
 
-class UserSegment(BaseModel):
-    segment: str
-    pain_level: str
-    current_solutions: List[str]
-    unmet_needs: List[str]
-    paying_potential: str
-
-
-class Competitor(BaseModel):
-    name: str
-    type: str
-    strengths: List[str]
-    weaknesses: List[str]
-
-
-class OpportunityScore(BaseModel):
-    score: float
-    reason: str
-
-
-class PricingInsights(BaseModel):
-    average_willingness_to_pay: str
-    common_models: List[str]
-
-
-from typing import Literal
-
-class Verdict(BaseModel):
-    verdict: str
-    confidence: float   # 0.0 to 1.0
-    reason: str
-
-
 class MarketOutput(BaseModel):
+    tam: str
+    sam: str
+    som: str
 
-    market_overview: Dict
+    growth_rate_by_segment: list
 
-    user_analysis: List[UserSegment]
+    industry_trends: list
 
-    competitor_analysis: List[Competitor]
+    market_opportunities: list
 
-    market_gaps: List[str]
+    threats_and_risks: list
 
-    trends: List[str]
-
-    opportunity_score: OpportunityScore
-
-    risks: List[str]
-
-    differentiation_strategy: List[str]
-
-    pricing_insights: PricingInsights
-
-    verdict: Verdict
+    market_intelligence_summary: str
