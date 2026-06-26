@@ -1,5 +1,20 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List
+
+
+class GrowthSegment(BaseModel):
+    segment: str
+    growth_rate: str
+
+
+class MarketOpportunity(BaseModel):
+    title: str
+    description: str
+
+
+class ThreatRisk(BaseModel):
+    title: str
+    description: str
 
 
 class MarketOutput(BaseModel):
@@ -7,12 +22,12 @@ class MarketOutput(BaseModel):
     sam: str
     som: str
 
-    growth_rate_by_segment: list
+    growth_rate_by_segment: List[GrowthSegment]
 
-    industry_trends: list
+    industry_trends: List[str]
 
-    market_opportunities: list
+    market_opportunities: List[MarketOpportunity]
 
-    threats_and_risks: list
+    threats_and_risks: List[ThreatRisk]
 
     market_intelligence_summary: str
