@@ -5,97 +5,105 @@ from ai_agents.utils.safe_llm import extract_json_safe, safe_validate
 
 
 COMPETITOR_PROMPT = """
-You are a Senior Competitive Intelligence Analyst.
+You are an expert startup consultant and market research analyst.
 
-You analyze competitors deeply and strategically.
+Analyze ONLY the startup described below.
+
+Your task is to identify REAL competitors operating in the SAME industry and solving the SAME problem.
+
+Do NOT invent unrelated companies.
+Do NOT use competitors from different industries.
+If a startup is niche, return the closest direct competitors.
+
+Use the startup information and market intelligence below.
+
+----------------------------------------
+STARTUP INFORMATION
+----------------------------------------
+
+Product:
+{product_name}
+
+Category:
+{category}
+
+Problem:
+{problem_statement}
+
+Solution:
+{recommended_solution}
+
+Target Users:
+{target_users}
+
+----------------------------------------
+MARKET INTELLIGENCE
+----------------------------------------
+
+Market Summary:
+{market_intelligence_summary}
+
+Market Opportunities:
+{market_opportunities}
+
+Threats:
+{threats_and_risks}
+
+----------------------------------------
+INSTRUCTIONS
+----------------------------------------
+
+• Return 5-6 direct competitors.
+• Prefer well-known companies whenever possible.
+• Pricing should reflect publicly known pricing where available.
+• If pricing is enterprise-based, write:
+  "Enterprise Pricing – Custom Quote"
+• If pricing is subscription-based, include actual monthly pricing if commonly available.
+• If pricing is usage-based, mention "Pay-as-you-go".
+• Mention key strengths and weaknesses.
+• Mention each competitor's market position.
+• Identify EXACTLY 3 market gaps.
+• Market gaps must describe opportunities NOT currently served well by competitors.
 
 Return ONLY valid JSON.
 
-ABSOLUTE RULES:
-- STRICT JSON only (no markdown, no explanation)
-- No extra keys outside schema
-- All lists must contain only strings
-- Be realistic and analytical
-
-INPUT CONTEXT:
-
-IDEA:
-{idea}
-
-MARKET INSIGHTS:
-{market}
-
-TASK:
-Generate deep competitor intelligence for this startup idea.
-
-OUTPUT FORMAT:
 {{
-  "competitor_landscape": {{
-    "direct_competitors": [],
-    "indirect_competitors": [],
-    "ai_disruptors": []
-  }},
-
-  "deep_profiles": [
+  "competitors": [
     {{
       "name": "",
-      "category": "",
-      "product_strategy": "",
+      "region": "",
+      "pricing": "",
       "strengths": [],
       "weaknesses": [],
-      "user_experience": "",
-      "pricing_model": "",
-      "target_users": []
+      "market_position": ""
     }}
   ],
-
-  "feature_matrix": {{ }},
-
-  "market_positioning": {{
-    "low_end_players": [],
-    "mid_tier": [],
-    "high_tier_ai": []
-  }},
-
-  "strategy_analysis": [
+  "market_gap_analysis": [
     {{
-      "competitor": "",
-      "strategy": ""
+      "title": "",
+      "description": ""
     }}
-  ],
-
-  "weaknesses": [],
-
-  "user_switch_triggers": [],
-
-  "opportunity_gaps": [],
-
-  "threat_assessment": [
-    {{
-      "competitor": "",
-      "threat_level": "LOW",
-      "reason": ""
-    }}
-  ],
-
-  "final_summary": {{
-    "market_saturated": true,
-    "winning_factor": "",
-    "key_insight": "",
-    "recommended_strategy": ""
-  }}
+  ]
 }}
+
+Do NOT include markdown.
+Do NOT include explanations.
+Do NOT include any text outside the JSON.
 """
 
 
 def run_competitor_agent(idea_result, market_result):
 
-    idea_context = getattr(idea_result, "summary", "")
-    market_context = getattr(market_result, "market_gaps", [])
-
     prompt = COMPETITOR_PROMPT.format(
-        idea=idea_context,
-        market=market_context
+        product_name=idea_result.product_name,
+        category=idea_result.category,
+        problem_statement=idea_result.problem_statement,
+        recommended_solution=idea_result.recommended_solution,
+        target_users=idea_result.target_users,
+
+        market_intelligence_summary=market_result.market_intelligence_summary,
+        market_opportunities=market_result.market_opportunities,
+        threats_and_risks=market_result.threats_and_risks,
     )
 
     response = llm.invoke(prompt)
@@ -107,12 +115,18 @@ def run_competitor_agent(idea_result, market_result):
         repair_prompt = f"""
 Convert this into VALID JSON only.
 
-No explanation. No markdown.
+No markdown.
+No explanation.
 
 {response.content}
 """
+
         repaired = llm.invoke(repair_prompt)
         data = extract_json_safe(repaired.content)
+
+    print("\n===== RAW COMPETITOR DATA =====")
+    print(data)
+    print("===============================\n")
 
     validated = safe_validate(CompetitorOutput, data)
 
