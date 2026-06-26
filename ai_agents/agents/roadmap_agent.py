@@ -71,29 +71,32 @@ OUTPUT FORMAT (STRICT JSON ONLY)
 Return ONLY JSON:
 
 {{
-  "roadmap": [
+  "roadmap":[
     {{
-      "phase": "",
-      "duration": "",
-      "deliverables": []
+      "phase":"",
+      "duration":"",
+      "deliverables":[]
     }}
   ],
-  "timeline_overview": [
+
+  "timeline_overview":[
     {{
-      "stage": "",
-      "duration": ""
+      "stage":"",
+      "duration":""
     }}
   ],
-  "key_milestones": [
+
+  "key_milestones":[
     {{
-      "milestone": "",
-      "timeline": ""
+      "milestone":"",
+      "timeline":""
     }}
   ],
-  "weekly_monthly_deliverables": [
+
+  "weekly_monthly_deliverables":[
     {{
-      "period": "",
-      "tasks": []
+      "period":"",
+      "tasks":[]
     }}
   ]
 }}
