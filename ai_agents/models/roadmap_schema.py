@@ -1,61 +1,30 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any
+from typing import List
 
 
-class ExecutiveSummary(BaseModel):
-    product: str
-    estimated_duration: str
-    team_size: str
-    launch_strategy: str
+class RoadmapPhase(BaseModel):
+    phase: str = Field(..., description="Phase name")
+    duration: str = Field(..., description="Time duration")
+    deliverables: List[str] = Field(default_factory=list)
 
 
-class Sprint(BaseModel):
-    sprint: int
-    duration: str
-    goals: List[str]
+class TimelineOverview(BaseModel):
+    stage: str = Field(..., description="Stage name")
+    duration: str = Field(..., description="Duration")
 
 
-class Dependency(BaseModel):
-    feature: str
-    depends_on: List[str]
+class KeyMilestone(BaseModel):
+    milestone: str = Field(..., description="Milestone description")
+    timeline: str = Field(..., description="When it happens")
 
 
-class Milestone(BaseModel):
-    name: str
-    week: int
-
-
-class PriorityFeature(BaseModel):
-    feature: str
-    priority: str
-    impact: str
-    complexity: str
+class WeeklyMonthlyDeliverable(BaseModel):
+    period: str = Field(..., description="Week or month range")
+    tasks: List[str] = Field(default_factory=list)
 
 
 class RoadmapOutput(BaseModel):
-
-    executive_summary: ExecutiveSummary
-
-    development_phases: List[Dict[str, Any]]
-
-    sprints: List[Sprint]
-
-    feature_dependencies: List[Dependency]
-
-    milestones: List[Milestone]
-
-    resource_plan: Dict[str, Any]
-
-    risk_plan: List[Dict[str, Any]]
-
-    mvp_features: List[Dict[str, Any]]
-
-    post_mvp_features: List[Dict[str, Any]]
-
-    launch_checklist: List[Dict[str, Any]]
-
-    timeline: Dict[str, Any]
-
-    priority_matrix: List[PriorityFeature]
-
-    
+    roadmap: List[RoadmapPhase] = Field(default_factory=list)
+    timeline_overview: List[TimelineOverview] = Field(default_factory=list)
+    key_milestones: List[KeyMilestone] = Field(default_factory=list)
+    weekly_monthly_deliverables: List[WeeklyMonthlyDeliverable] = Field(default_factory=list)

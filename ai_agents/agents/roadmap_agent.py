@@ -5,167 +5,138 @@ from ai_agents.utils.safe_llm import extract_json_safe, safe_validate
 
 
 # -----------------------------
-# NORMALIZER
+# PROMPT BUILDER (SAFE)
 # -----------------------------
-def normalize_roadmap(data: dict):
-    if not isinstance(data, dict):
-        return {}
+def build_prompt(idea_result, market_result, competitor_result):
 
-    def safe_list(value):
-        if isinstance(value, list):
-            return [
-                item if isinstance(item, dict) else {"value": str(item)}
-                for item in value
-            ]
-        return []
+    return f"""
+You are an experienced Startup Product Manager and VC Advisor.
 
-    def safe_dict(value):
-        return value if isinstance(value, dict) else {}
+Generate a practical startup execution roadmap.
 
-    return {
-        "executive_summary": safe_dict(data.get("executive_summary")),
-        "development_phases": safe_list(data.get("development_phases")),
-        "sprints": safe_list(data.get("sprints")),
-        "feature_dependencies": safe_list(data.get("feature_dependencies")),
-        "milestones": safe_list(data.get("milestones")),
-        "resource_plan": safe_dict(data.get("resource_plan")),
-        "risk_plan": safe_list(data.get("risk_plan")),
-        "mvp_features": safe_list(data.get("mvp_features")),
-        "post_mvp_features": safe_list(data.get("post_mvp_features")),
-        "launch_checklist": safe_list(data.get("launch_checklist")),
-        "timeline": safe_dict(data.get("timeline")),
-        "priority_matrix": safe_list(data.get("priority_matrix")),
-    }
+========================
+Startup Information
+========================
 
-# -----------------------------
-# PROMPT
-# -----------------------------
-ROADMAP_PROMPT = """
-You are a Senior Startup Product Manager.
+Product:
+{idea_result.product_name}
 
-Generate a complete startup execution roadmap.
+Category:
+{idea_result.category}
 
-JSON FORMAT MUST FOLLOW EXACTLY:
+Problem:
+{idea_result.problem_statement}
+
+Solution:
+{idea_result.recommended_solution}
+
+Target Users:
+{idea_result.target_users}
+
+Market Summary:
+{market_result.market_intelligence_summary}
+
+Market Opportunities:
+{market_result.market_opportunities}
+
+Competitor Market Gaps:
+{competitor_result.market_gap_analysis}
+
+========================
+REQUIREMENTS
+========================
+
+Create EXACTLY FIVE phases:
+
+1. Research & Validation
+2. MVP Build
+3. Closed Beta
+4. Public Launch
+5. Scale & Institutional
+
+Each phase must include:
+- phase
+- duration
+- 4-6 deliverables
+
+Also generate:
+- Timeline overview (5 entries)
+- 5-6 key milestones
+- weekly/monthly deliverables
+
+========================
+OUTPUT FORMAT (STRICT JSON ONLY)
+========================
+
+Return ONLY JSON:
 
 {{
-  "executive_summary": {{
-    "product": "string",
-    "estimated_duration": "string",
-    "team_size": "string",
-    "launch_strategy": "string"
-  }},
-  "development_phases": [],
-  "sprints": [
+  "roadmap": [
     {{
-      "sprint": 1,
-      "duration": "2 weeks",
-      "goals": ["goal1", "goal2"]
+      "phase": "",
+      "duration": "",
+      "deliverables": []
     }}
   ],
-  "feature_dependencies": [
+  "timeline_overview": [
     {{
-      "feature": "string",
-      "depends_on": ["string"]
+      "stage": "",
+      "duration": ""
     }}
   ],
-  "milestones": [
+  "key_milestones": [
     {{
-      "name": "string",
-      "week": 1
+      "milestone": "",
+      "timeline": ""
     }}
   ],
-  "resource_plan": {{}},
-  "risk_plan": [],
-  "mvp_features": [],
-  "post_mvp_features": [],
-  "launch_checklist": [],
-  "timeline": {{}},
-  "priority_matrix": [
+  "weekly_monthly_deliverables": [
     {{
-      "feature": "string",
-      "priority": "High",
-      "impact": "High",
-      "complexity": "Medium"
+      "period": "",
+      "tasks": []
     }}
   ]
 }}
 
-STRICT REQUIREMENTS
-
-- Return ONLY valid JSON
-- No markdown
-- No explanations
-- Use EXACT field names shown above
-- Do NOT create product_name
-- Do NOT create summary
-- Do NOT create sprint_name
-- Do NOT create milestone_name
-- No empty strings
-- No empty arrays
-- No empty objects
-
-MANDATORY
-
-- executive_summary fully populated
-- minimum 3 development phases
-- minimum 3 sprints
-- minimum 5 MVP features
-- minimum 3 risks
-- non-empty resource_plan
-- non-empty timeline
-- non-empty priority_matrix
-
-IDEA:
-{idea}
-
-MARKET:
-{market}
-
-COMPETITOR:
-{competitor}
-
-Return ONLY JSON.
+NO markdown.
+NO explanation.
+ONLY JSON.
 """
 
+
 # -----------------------------
-# QUALITY CHECK
+# NORMALIZER
 # -----------------------------
-def is_bad_output(data: dict):
+def normalize_roadmap(data):
+    if not isinstance(data, dict):
+        return {}
+
+    return {
+        "roadmap": data.get("roadmap", []),
+        "timeline_overview": data.get("timeline_overview", []),
+        "key_milestones": data.get("key_milestones", []),
+        "weekly_monthly_deliverables": data.get("weekly_monthly_deliverables", []),
+    }
+
+
+# -----------------------------
+# VALIDATION
+# -----------------------------
+def is_bad_output(data):
 
     if not isinstance(data, dict):
         return True
 
-    executive = data.get("executive_summary", {})
-
-    required_exec = [
-        executive.get("product"),
-        executive.get("estimated_duration"),
-        executive.get("team_size"),
-        executive.get("launch_strategy"),
-    ]
-
-    if any(not value for value in required_exec):
+    if len(data.get("roadmap", [])) != 5:
         return True
 
-    if len(data.get("development_phases", [])) < 3:
+    if len(data.get("timeline_overview", [])) < 5:
         return True
 
-    if len(data.get("sprints", [])) < 3:
+    if len(data.get("key_milestones", [])) < 5:
         return True
 
-    if len(data.get("mvp_features", [])) < 5:
-        return True
-
-    if len(data.get("risk_plan", [])) < 3:
-        return True
-
-    if len(data.get("priority_matrix", [])) < 3:
-        return True
-
-    if not data.get("resource_plan"):
-        return True
-
-    if not data.get("timeline"):
+    if len(data.get("weekly_monthly_deliverables", [])) < 5:
         return True
 
     return False
@@ -174,124 +145,44 @@ def is_bad_output(data: dict):
 # -----------------------------
 # MAIN AGENT
 # -----------------------------
-def run_roadmap_agent(
-    idea_result,
-    market_result,
-    competitor_result
-):
+def run_roadmap_agent(idea_result, market_result, competitor_result):
 
-    idea_context = {
-        "product_name": getattr(
-            idea_result,
-            "product_name",
-            ""
-        ),
-        "summary": getattr(
-            idea_result,
-            "summary",
-            ""
-        ),
-        "target_users": getattr(
-            idea_result,
-            "target_users",
-            []
-        )
-    }
-
-    market_context = {
-        "market_gaps": getattr(
-            market_result,
-            "market_gaps",
-            []
-        ),
-        "risks": getattr(
-            market_result,
-            "risks",
-            []
-        )
-    }
-
-    competitor_context = {
-        "opportunity_gaps": getattr(
-            competitor_result,
-            "opportunity_gaps",
-            []
-        ),
-        "weaknesses": getattr(
-            competitor_result,
-            "weaknesses",
-            []
-        )
-    }
-
-    prompt = ROADMAP_PROMPT.format(
-        idea=str(idea_context),
-        market=str(market_context),
-        competitor=str(competitor_context)
+    prompt = build_prompt(
+        idea_result,
+        market_result,
+        competitor_result
     )
 
     data = {}
 
     for attempt in range(5):
 
-        current_prompt = prompt
-
-        if attempt > 0:
-            current_prompt += """
-
-IMPORTANT:
-
-Previous response was rejected.
-
-You MUST:
-- fill every field
-- return at least 3 phases
-- return at least 3 sprints
-- return at least 5 MVP features
-- return at least 3 risks
-- return resource_plan
-- return timeline
-- return priority_matrix
-
-No empty strings.
-No empty arrays.
-No empty objects.
-
-Return ONLY valid JSON.
-"""
-
-        response = llm.invoke(current_prompt)
+        response = llm.invoke(prompt)
 
         try:
             data = extract_json_safe(response.content)
 
         except Exception:
 
-            repaired = llm.invoke(
-                f"Convert the following into valid JSON only:\n\n{response.content}"
+            repair = llm.invoke(
+                "Convert this into ONLY valid JSON:\n\n" + response.content
             )
 
-            data = extract_json_safe(
-                repaired.content
-            )
+            data = extract_json_safe(repair.content)
 
         if not is_bad_output(data):
             break
 
+        prompt += "\n\nFix: Return complete JSON with all 5 phases properly filled."
+
     fixed = normalize_roadmap(data)
 
-    print("\n===== RAW ROADMAP DATA =====")
+    print("\n===== ROADMAP OUTPUT =====")
     print(fixed)
-    print("===========================\n")
+    print("=========================\n")
 
-    validated = safe_validate(
-        RoadmapOutput,
-        fixed
-    )
+    validated = safe_validate(RoadmapOutput, fixed)
 
-    save_output(
-        validated.model_dump(),
-        "roadmap_output.json"
-    )
+    save_output(validated.model_dump(), "roadmap_output.json")
 
     return validated
