@@ -24,3 +24,6 @@ outputs/
 
 # Database / caches
 *.sqlite
+
+node_modules/
+.env
