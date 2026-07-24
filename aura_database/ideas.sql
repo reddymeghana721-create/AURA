@@ -1,0 +1,27 @@
+USE aura_db;
+
+CREATE TABLE ideas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    problem TEXT,
+    solution TEXT,
+    status VARCHAR(50) DEFAULT 'draft',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+SHOW TABLES;
+DESCRIBE ideas;
+SELECT * FROM ideas;
+SELECT * FROM ideas ORDER BY id DESC;
+SELECT id,user_id,title
+FROM ideas;
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE ideas;
+SET FOREIGN_KEY_CHECKS = 1;
+ALTER TABLE ideas ADD COLUMN industry VARCHAR(100);
+ALTER TABLE ideas ADD COLUMN target_audience VARCHAR(255);
+ALTER TABLE ideas ADD COLUMN product_idea TEXT;
+ALTER TABLE ideas ADD COLUMN vision TEXT;
+ALTER TABLE ideas ADD COLUMN primary_goal TEXT;
