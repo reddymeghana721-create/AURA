@@ -27,3 +27,9 @@ outputs/
 
 node_modules/
 .env
+__pycache__/
+*.pyc
+venv/
+dist/
+build/
+node_modules/
